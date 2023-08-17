@@ -1,5 +1,7 @@
-import { Breed } from "src/breeds/entities/breed.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+
+import { Breed } from "../../breeds/entities/breed.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Entity()
 export class Cat {
@@ -13,13 +15,13 @@ export class Cat {
     @Column('smallint')
     age: number
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_at' })
     deletedAt: Date
 
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date
 
     @ManyToOne(() => Breed, (breed) => breed.name, {
@@ -29,6 +31,16 @@ export class Cat {
         name: 'breed',
         referencedColumnName: 'name'
     })
+    breeds: Breed
+
+    @Column()
     breed: string
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'user_email', referencedColumnName: 'email' })
+    user: User
+
+    @Column({ name: 'user_email', default: 'test@example.com' })
+    userEmail?: string
 
 }

@@ -12,16 +12,16 @@ export class Breed {
     })
     name: string;
 
-    @DeleteDateColumn()
-    deletedAt: Date;
+    @DeleteDateColumn({name: 'deleted_at' })
+    deletedAt: Date
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date
 
-    @OneToMany(() => Cat, (cat) => cat.breed )
+    @OneToMany(() => Cat, (cat) => cat.breeds )
     cats: Cat[]
 
 }

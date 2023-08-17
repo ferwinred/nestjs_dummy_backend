@@ -12,6 +12,7 @@ export class BreedsService {
     private readonly breedRepository: Repository<Breed>,
   ) {}
 
+ 
   async create(createBreedDto: CreateBreedDto) {
     try {
       return await this.breedRepository.save(createBreedDto);
@@ -21,10 +22,12 @@ export class BreedsService {
     }
   }
 
+
   async findAll() {
     return await this.breedRepository.find();
   }
 
+ 
   async findOne(id: string) {
     const breed = await this.breedRepository.findOne({
       where: {
@@ -49,6 +52,7 @@ export class BreedsService {
       return this.handleError(error);
     }
   }
+
 
   async remove(id: string) {
     return await this.breedRepository.softDelete(id);

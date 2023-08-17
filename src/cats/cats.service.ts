@@ -1,10 +1,11 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Cat } from './entity/cats.entity';
 import { CreateCatDto, UpdateCatDto } from './dtos';
-import { Breed } from 'src/breeds/entities/breed.entity';
+import { Breed } from '../breeds/entities/breed.entity';
+import { Role } from '../common/enums';
 
 @Injectable()
 export class CatsService {
@@ -18,30 +19,42 @@ export class CatsService {
         private readonly breedRepository: Repository<Breed>,
     ){}
 
-    async findAll(){
-        return await this.catsRepository.find();
-    }
+    async findAll(user: User){
+        if (user.role === Role.ADMIN) return await this.catsRepository.find();
 
-    async findOne(id: string){
-        return await this.catsRepository.findOne({
+        return await this.catsRepository.find({
             where: {
-                id,
+                userEmail: user.email
             }
         });
     }
 
-    async create(createCatsDto: CreateCatDto){
+    async findOne(id: string, user: User){
+
+        const cat = await this.catsRepository.findOneBy({id})
+
+        if (!cat) throw new NotFoundException(`Cat not found`)
+
+        this.validateOwnership(cat, user) 
+        
+        return cat;
+    }
+
+
+    async create(createCatsDto: CreateCatDto, user: User){
 
         try {
-            
+
             const breed = await this.breedRepository.findOneBy({
                 name: createCatsDto.breed 
             });
 
-            if (!breed) throw new NotFoundException(`Cannot find the breed: ${createCatsDto.breed}`);
+            await this.validateBreed(breed);
+            
+            createCatsDto.userEmail = user.email;
 
             const cat = this.catsRepository.create(createCatsDto);
-    
+
             return await this.catsRepository.save(cat);
 
         } catch (error) {
@@ -50,11 +63,29 @@ export class CatsService {
         
     }
 
-    async update(id: string, data: UpdateCatDto){
-        // return this.catsRepository.update(id, UpdateCatDto);
+    async update(id: string, updateCatDto: UpdateCatDto, user: User) {
+
+        let breed: Breed;
+        const cat = await this.findOne(id, user);
+
+        if (updateCatDto.breed){ 
+            breed = await this.breedRepository.findOneBy({ name: updateCatDto.breed })
+            
+            await this.validateBreed(breed);
+
+        }
+
+        const catToUpdate = {...updateCatDto, id: cat.id, userEmail: user.email}
+
+        const newCat = await this.catsRepository.preload(catToUpdate);
+
+        return this.catsRepository.save(newCat);
     }
 
-    async delete(id: string){
+    async delete(id: string, user: User) {
+
+        await this.findOne(id, user);
+
         return this.catsRepository.softDelete(id);
     }
 
@@ -66,5 +97,13 @@ export class CatsService {
     
         throw new InternalServerErrorException(e);
       }
+
+    private validateOwnership(cat: Cat, user: User) {
+        if (user.role !== Role.ADMIN && cat.userEmail !== user.email) throw new UnauthorizedException(`Not authorized`)
+    } 
+
+    private async validateBreed(breed: Breed){
+        if (!breed) throw new NotFoundException(`Cannot find the breed`);
+    }
       
 }

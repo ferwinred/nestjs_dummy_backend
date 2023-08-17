@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
+import { Role } from "../../common/enums";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn('uuid')
@@ -18,20 +19,24 @@ export class User {
 
     @Column('varchar', 
     {
-        nullable: false
+        nullable: false,
+        select: false
     }
     )
     password: string
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_at' })
     deletedAt: Date
 
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date
 
-
-    role: string
+    @Column("enum",{
+        default: Role.USER,
+        enum: Role
+    })
+    role: Role
 }
