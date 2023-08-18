@@ -13,27 +13,39 @@ import { CreateBreedDto, UpdateBreedDto } from './dto';
 import { Role } from 'src/common/enums';
 import { Auth } from 'src/common/decorators';
 
+/** 
+ * @class
+ * This class is a controller for the Breeds module
+ * 
+*/
 @Controller('breeds')
 export class BreedsController {
+
+  /**
+   * @constructor 
+   * 
+   * @param breedsService
+   * @Inject the BreedsService
+   */
   constructor(private readonly breedsService: BreedsService) {}
 
   @Auth(Role.ADMIN)
   @Post()
-  create(@Body() createBreedDto: CreateBreedDto) {
-      return this.breedsService.create(createBreedDto);
+  async create(@Body() createBreedDto: CreateBreedDto) {
+      return await this.breedsService.create(createBreedDto);
    
   }
 
   @Auth(Role.USER)
   @Get()
-  findAll() {
-    return this.breedsService.findAll();
+  async findAll() {
+    return await this.breedsService.findAll();
   }
 
   @Auth(Role.USER)
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.breedsService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.breedsService.findOne(id);
   }
 
   @Auth(Role.ADMIN)

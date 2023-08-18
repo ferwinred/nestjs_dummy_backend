@@ -1,6 +1,5 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
-import { jwtConstants } from '../constants';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -19,16 +18,15 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException(`Invalid Token`);
 
     try {
-      const payload = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret: jwtConstants.secret
-        }
-      );
-    
+
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET
+      });
+
       request['user'] = payload;
 
-    } catch {
+    } catch (e){
+      console.error(e);
       throw new UnauthorizedException(`Invalid Token`);
     }
     return true;

@@ -3,8 +3,9 @@ import { Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto';
-import { Role } from 'src/common/enums';
+import { Role } from '../common/enums';
 import { ActiveUser, Auth } from '../common/decorators';
+import { User } from '../common/interfaces';
 
 
 @Controller('auth')

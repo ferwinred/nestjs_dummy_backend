@@ -7,6 +7,7 @@ import { CatsService } from './cats.service';
 import { CreateCatDto, UpdateCatDto } from './dtos';
 import { ActiveUser, Auth } from '../common/decorators';
 import { Role } from '../common/enums';
+import { User } from '../common/interfaces';
 
 @Auth(Role.USER)
 @Controller('cats')

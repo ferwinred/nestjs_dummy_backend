@@ -1,10 +1,13 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs';
 
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/auth/user.service';
 import { LoginDto, RegisterDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 
+/**
+ * 
+ */
 @Injectable()
 export class AuthService {
 
@@ -14,6 +17,7 @@ export class AuthService {
     ){}
 
     async login(loginDto: LoginDto) {
+        console.log('JwtService AuthService: ', this.jwtService)
         const user = await this.userService.findByEmailWithPassword(loginDto.email);
 
         if (!user) throw new UnauthorizedException(`Wrong email or password`);

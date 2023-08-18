@@ -1,18 +1,19 @@
-import { CatsModule } from './cats/cats.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { BreedsModule } from './breeds/breeds.module';
-import { UserModule } from './user/user.module';
+import { HttpModule } from '@nestjs/axios';
+
 import { AuthModule } from './auth/auth.module';
+import { CatsModule } from './cats/cats.module';
+import { BreedsModule } from './breeds/breeds.module';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   imports: [
-    CatsModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
+      inject: [ConfigService], 
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('DB_HOST'),
@@ -24,10 +25,18 @@ import { AuthModule } from './auth/auth.module';
         synchronize: true,
       }),
     }),
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        timeout: configService.get('HTTP_TIMEOUT'),
+        maxRedirects: configService.get('HTTP_MAX_REDIRECTS'),
+      }),
+      inject: [ConfigService],
+    }),
     CatsModule,
     BreedsModule,
-    UserModule,
-    AuthModule
+    AuthModule,
+    SeederModule
   ],
   controllers: [],
   providers: [],

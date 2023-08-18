@@ -6,6 +6,7 @@ import { Cat } from './entity/cats.entity';
 import { CreateCatDto, UpdateCatDto } from './dtos';
 import { Breed } from '../breeds/entities/breed.entity';
 import { Role } from '../common/enums';
+import { User } from '../common/interfaces';
 
 @Injectable()
 export class CatsService {
@@ -61,6 +62,10 @@ export class CatsService {
             return this.handleError(error);
         }
         
+    }
+
+    async bulkCreate(){
+        return `Bulk create`
     }
 
     async update(id: string, updateCatDto: UpdateCatDto, user: User) {
