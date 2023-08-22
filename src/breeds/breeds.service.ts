@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { CreateBreedDto, UpdateBreedDto } from './dto';
 import { Breed } from './entities/breed.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 /** 
  * @class 
@@ -61,8 +62,11 @@ export class BreedsService {
    * @description This method return all the Breeds
    * 
    */
-  async findAll(): Promise<Breed[]> {
-    return await this.breedRepository.find();
+  async findAll( { limit=10, offset=0}: PaginationDto ): Promise<Breed[]> {
+    return await this.breedRepository.find({
+      take: limit,
+      skip: offset
+    });
   }
 
   /**
@@ -99,6 +103,7 @@ export class BreedsService {
 
       if (breed.affected !== 1) throw new NotFoundException(`Could not found any Breed with Id ${id}`); 
       
+      return breed;
     } catch (error) {
       return this.handleError(error);
     }

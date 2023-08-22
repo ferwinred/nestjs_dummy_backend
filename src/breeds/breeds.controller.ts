@@ -6,18 +6,29 @@ import {
   Patch, 
   Param, 
   Delete, 
-  ParseUUIDPipe } from '@nestjs/common';
+  ParseUUIDPipe, 
+  Query,
+  UseInterceptors} from '@nestjs/common';
+  import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { BreedsService } from './breeds.service';
 import { CreateBreedDto, UpdateBreedDto } from './dto';
-import { Role } from 'src/common/enums';
-import { Auth } from 'src/common/decorators';
+import { Role } from '../common/enums';
+import { Auth } from '../common/decorators';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { LoggingInterceptor } from '../common/interceptors/logging.interceptor';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { ErrorsInterceptor } from 'src/common/interceptors/error.interceptor';
 
 /** 
  * @class
  * This class is a controller for the Breeds module
  * 
 */
+
+@ApiTags('Breeds')
+@ApiBearerAuth()
+@UseInterceptors(LoggingInterceptor, ResponseInterceptor, ErrorsInterceptor)
 @Controller('breeds')
 export class BreedsController {
 
@@ -38,8 +49,8 @@ export class BreedsController {
 
   @Auth(Role.USER)
   @Get()
-  async findAll() {
-    return await this.breedsService.findAll();
+  async findAll(@Query() pagination: PaginationDto) {
+    return await this.breedsService.findAll(pagination);
   }
 
   @Auth(Role.USER)

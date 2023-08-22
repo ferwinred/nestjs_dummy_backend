@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto';
@@ -8,6 +9,7 @@ import { ActiveUser, Auth } from '../common/decorators';
 import { User } from '../common/interfaces';
 
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 
@@ -21,14 +23,6 @@ export class AuthController {
     @Post('register')
     async register(@Body() registerDto: RegisterDto ){
         return await this.authService.register(registerDto);
-    }
-
-    @Get('profile')
-    // @Roles([ Role.ADMIN, Role.USER ])
-    // @UseGuards(AuthGuard, RolesGuard)
-    @Auth(Role.ADMIN, Role.USER)
-    profile( @ActiveUser() user: User){
-        return user;
     }
     
 }

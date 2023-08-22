@@ -1,6 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { Auth } from '../common/decorators';
-import { Role } from 'src/common/enums';
+import { Role } from '../common/enums';
 import { SeederService } from './seeder.service';
 
 /**
@@ -8,6 +10,9 @@ import { SeederService } from './seeder.service';
  * Receives the requests from the client and send them to the service
  * 
  */
+
+@ApiTags('Seeds')
+@ApiBearerAuth()
 @Auth(Role.ADMIN)
 @Controller('seeder')
 export class SeederController {
@@ -31,3 +36,4 @@ export class SeederController {
     }
 
 }
+

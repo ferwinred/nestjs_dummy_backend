@@ -7,6 +7,7 @@ import { CreateCatDto, UpdateCatDto } from './dtos';
 import { Breed } from '../breeds/entities/breed.entity';
 import { Role } from '../common/enums';
 import { User } from '../common/interfaces';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class CatsService {
@@ -20,13 +21,15 @@ export class CatsService {
         private readonly breedRepository: Repository<Breed>,
     ){}
 
-    async findAll(user: User){
+    async findAll(user: User, { limit=10, offset=0 }: PaginationDto){
         if (user.role === Role.ADMIN) return await this.catsRepository.find();
 
         return await this.catsRepository.find({
             where: {
                 userEmail: user.email
-            }
+            },
+            take: limit,
+            skip: offset
         });
     }
 

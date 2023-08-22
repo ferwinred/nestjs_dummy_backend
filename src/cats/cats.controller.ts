@@ -2,22 +2,30 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { CatsService } from './cats.service';
 import { CreateCatDto, UpdateCatDto } from './dtos';
 import { ActiveUser, Auth } from '../common/decorators';
 import { Role } from '../common/enums';
 import { User } from '../common/interfaces';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
+@ApiTags('Cats')
+@ApiBearerAuth()
 @Auth(Role.USER)
+@UseInterceptors(LoggingInterceptor, ResponseInterceptor)
 @Controller('cats')
 export class CatsController {
 
     constructor(private readonly catsService: CatsService){}
 
     @Get()
-    async findAll(@ActiveUser() user: User){
-        return await this.catsService.findAll(user);
+    async findAll(@Query() pagination: PaginationDto, @ActiveUser() user: User){
+        return await this.catsService.findAll(user, pagination);
     }
 
     @Get(':id')
